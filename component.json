@@ -1,0 +1,12 @@
+{
+  "name": "stemmer-gh-pages",
+  "private": true,
+  "repository": "wooorm/stemmer",
+  "dependencies": {
+    "wooorm/stemmer": "^0.1.0"
+  },
+  "scripts": [
+    "index.js"
+  ],
+  "license": "MIT"
+}
