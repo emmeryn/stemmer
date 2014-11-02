@@ -52,7 +52,7 @@ require.define = function (name, exports) {
     exports: exports
   };
 };
-require.register("wooorm~stemmer@0.1.2", function (exports, module) {
+require.register("wooorm~stemmer@0.1.3", function (exports, module) {
 'use strict';
 
 /**
@@ -63,37 +63,37 @@ var step2list,
     step3list;
 
 step2list = {
-    'ational' : 'ate',
-    'tional' : 'tion',
-    'enci' : 'ence',
-    'anci' : 'ance',
-    'izer' : 'ize',
-    'bli' : 'ble',
-    'alli' : 'al',
-    'entli' : 'ent',
-    'eli' : 'e',
-    'ousli' : 'ous',
-    'ization' : 'ize',
-    'ation' : 'ate',
-    'ator' : 'ate',
-    'alism' : 'al',
-    'iveness' : 'ive',
-    'fulness' : 'ful',
-    'ousness' : 'ous',
-    'aliti' : 'al',
-    'iviti' : 'ive',
-    'biliti' : 'ble',
-    'logi' : 'log'
+    'ational': 'ate',
+    'tional': 'tion',
+    'enci': 'ence',
+    'anci': 'ance',
+    'izer': 'ize',
+    'bli': 'ble',
+    'alli': 'al',
+    'entli': 'ent',
+    'eli': 'e',
+    'ousli': 'ous',
+    'ization': 'ize',
+    'ation': 'ate',
+    'ator': 'ate',
+    'alism': 'al',
+    'iveness': 'ive',
+    'fulness': 'ful',
+    'ousness': 'ous',
+    'aliti': 'al',
+    'iviti': 'ive',
+    'biliti': 'ble',
+    'logi': 'log'
 };
 
 step3list = {
-    'icate' : 'ic',
-    'ative' : '',
-    'alize' : 'al',
-    'iciti' : 'ic',
-    'ical' : 'ic',
-    'ful' : '',
-    'ness' : ''
+    'icate': 'ic',
+    'ative': '',
+    'alize': 'al',
+    'iciti': 'ic',
+    'ical': 'ic',
+    'ful': '',
+    'ness': ''
 };
 
 /**
@@ -382,7 +382,7 @@ module.exports = stemmer;
 });
 
 require.register("stemmer-gh-pages", function (exports, module) {
-var stemmer = require("wooorm~stemmer@0.1.2");
+var stemmer = require('wooorm~stemmer@0.1.3');
 var inputElement = document.getElementsByTagName('input')[0];
 var outputElement = document.getElementsByTagName('output')[0];
 
@@ -398,4 +398,4 @@ stem();
 
 });
 
-require("stemmer-gh-pages")
+require("stemmer-gh-pages");
