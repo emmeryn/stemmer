@@ -1,61 +1,128 @@
-/**
- * Require the module at `name`.
- *
- * @param {String} name
- * @return {Object} exports
- * @api public
- */
+(function outer(modules, cache, entries){
 
-function require(name) {
-  var module = require.modules[name];
-  if (!module) throw new Error('failed to require "' + name + '"');
+  /**
+   * Global
+   */
 
-  if (!('exports' in module) && typeof module.definition === 'function') {
-    module.client = module.component = true;
-    module.definition.call(this, module.exports = {}, module);
-    delete module.definition;
+  var global = (function(){ return this; })();
+
+  /**
+   * Require `name`.
+   *
+   * @param {String} name
+   * @param {Boolean} jumped
+   * @api public
+   */
+
+  function require(name, jumped){
+    if (cache[name]) return cache[name].exports;
+    if (modules[name]) return call(name, require);
+    throw new Error('cannot find module "' + name + '"');
   }
 
-  return module.exports;
-}
+  /**
+   * Call module `id` and cache it.
+   *
+   * @param {Number} id
+   * @param {Function} require
+   * @return {Function}
+   * @api private
+   */
 
-/**
- * Registered modules.
- */
+  function call(id, require){
+    var m = cache[id] = { exports: {} };
+    var mod = modules[id];
+    var name = mod[2];
+    var fn = mod[0];
 
-require.modules = {};
+    fn.call(m.exports, function(req){
+      var dep = modules[id][1][req];
+      return require(dep ? dep : req);
+    }, m, m.exports, outer, modules, cache, entries);
 
-/**
- * Register module at `name` with callback `definition`.
- *
- * @param {String} name
- * @param {Function} definition
- * @api private
- */
+    // expose as `name`.
+    if (name) cache[name] = cache[id];
 
-require.register = function (name, definition) {
-  require.modules[name] = {
-    definition: definition
-  };
-};
+    return cache[id].exports;
+  }
 
-/**
- * Define a module's exports immediately with `exports`.
- *
- * @param {String} name
- * @param {Generic} exports
- * @api private
- */
+  /**
+   * Require all entries exposing them on global if needed.
+   */
 
-require.define = function (name, exports) {
-  require.modules[name] = {
-    exports: exports
-  };
-};
-require.register("wooorm~stemmer@0.1.3", function (exports, module) {
+  for (var id in entries) {
+    if (entries[id]) {
+      global[entries[id]] = require(id);
+    } else {
+      require(id);
+    }
+  }
+
+  /**
+   * Duo flag.
+   */
+
+  require.duo = true;
+
+  /**
+   * Expose cache.
+   */
+
+  require.cache = cache;
+
+  /**
+   * Expose modules
+   */
+
+  require.modules = modules;
+
+  /**
+   * Return newest require.
+   */
+
+   return require;
+})({
+1: [function(require, module, exports) {
 'use strict';
 
-/**
+/*
+ * Dependencies.
+ */
+
+var stemmer = require('wooorm/stemmer@0.1.4');
+
+/*
+ * DOM nodes.
+ */
+
+var $input = document.getElementsByTagName('input')[0];
+var $output = document.getElementsByTagName('output')[0];
+
+/*
+ * Handlers.
+ */
+
+function oninputchange() {
+    $output.textContent = stemmer($input.value);
+}
+
+/*
+ * Listen.
+ */
+
+$input.addEventListener('input', oninputchange);
+
+/*
+ * Initial answer.
+ */
+
+oninputchange();
+
+}, {"wooorm/stemmer@0.1.4":2}],
+2: [function(require, module, exports) {
+'use strict';
+
+/*
  * Define few standard suffix manipulations.
  */
 
@@ -96,7 +163,7 @@ step3list = {
     'ness': ''
 };
 
-/**
+/*
  * Define few consonant-vowel sequences.
  */
 
@@ -137,7 +204,7 @@ EXPRESSION_CONSONANT_LIKE = new RegExp(
     '^' + consonantSequence + vowel + '[^aeiouwxy]$'
 );
 
-/**
+/*
  * Define few exception-expressions.
  */
 
@@ -188,7 +255,7 @@ EXPRESSION_STEP_4 = new RegExp(
     'iti|ous|ive|ize)$'
 );
 
-/**
+/*
  * Detect the character code for `y`.
  */
 
@@ -197,19 +264,18 @@ var CHARACTER_CODE_Y;
 CHARACTER_CODE_Y = 'y'.charCodeAt(0);
 
 /**
- * Define `stemmer`.
+ * Stem `value`.
  *
  * @param {string} value
- * @return {string} Stem corresponding to `value`.
+ * @return {string} - Stem corresponding to `value`.
  */
-
 function stemmer(value) {
     var firstCharacterWasLowerCaseY,
         match;
 
     value = String(value).toLowerCase();
 
-    /**
+    /*
      * Exit early.
      */
 
@@ -217,7 +283,7 @@ function stemmer(value) {
         return value;
     }
 
-    /**
+    /*
      * Detect initial `y`, make sure it never
      * matches.
      */
@@ -227,31 +293,31 @@ function stemmer(value) {
         value = 'Y' + value.substr(1);
     }
 
-    /**
+    /*
      * Step 1a.
      */
 
     if (EXPRESSION_SUFFIX_SSES_OR_IES.test(value)) {
-        /**
+        /*
          * Remove last two characters.
          */
 
         value = value.substr(0, value.length - 2);
     } else if (EXPRESSION_SUFFIX_S.test(value)) {
-        /**
+        /*
          * Remove last character.
          */
 
         value = value.substr(0, value.length - 1);
     }
 
-    /**
+    /*
      * Step 1b.
      */
 
     if (match = EXPRESSION_SUFFIX_EED.exec(value)) {
         if (EXPRESSION_MEASURE_GREATER_THAN_0.test(match[1])) {
-            /**
+            /*
              * Remove last character.
              */
 
@@ -264,7 +330,7 @@ function stemmer(value) {
         value = match[1];
 
         if (EXPRESSION_SUFFIX_AT_OR_BL_OR_IZ.test(value)) {
-            /**
+            /*
              * Append `e`.
              */
 
@@ -272,13 +338,13 @@ function stemmer(value) {
         } else if (
             EXPRESSION_SUFFIX_MULTI_CONSONANT_LIKE.test(value)
         ) {
-            /**
+            /*
              * Remove last character.
              */
 
             value = value.substr(0, value.length - 1);
         } else if (EXPRESSION_CONSONANT_LIKE.test(value)) {
-            /**
+            /*
              * Append `e`.
              */
 
@@ -286,7 +352,7 @@ function stemmer(value) {
         }
     }
 
-    /**
+    /*
      * Step 1c.
      */
 
@@ -294,14 +360,14 @@ function stemmer(value) {
         (match = EXPRESSION_SUFFIX_Y.exec(value)) &&
         EXPRESSION_VOWEL_IN_STEM.test(match[1])
     ) {
-        /**
+        /*
          * Remove suffixing `y` and append `i`.
          */
 
         value = match[1] + 'i';
     }
 
-    /**
+    /*
      * Step 2.
      */
 
@@ -312,7 +378,7 @@ function stemmer(value) {
         value = match[1] + step2list[match[2]];
     }
 
-    /**
+    /*
      * Step 3.
      */
 
@@ -323,7 +389,7 @@ function stemmer(value) {
         value = match[1] + step3list[match[2]];
     }
 
-    /**
+    /*
      * Step 4.
      */
 
@@ -338,7 +404,7 @@ function stemmer(value) {
         value = match[1];
     }
 
-    /**
+    /*
      * Step 5.
      */
 
@@ -362,7 +428,7 @@ function stemmer(value) {
         value = value.substr(0, value.length - 1);
     }
 
-    /**
+    /*
      * Turn initial `Y` back to `y`.
      */
 
@@ -373,29 +439,10 @@ function stemmer(value) {
     return value;
 }
 
-/**
+/*
  * Expose `stemmer`.
  */
 
 module.exports = stemmer;
 
-});
-
-require.register("stemmer-gh-pages", function (exports, module) {
-var stemmer = require('wooorm~stemmer@0.1.3');
-var inputElement = document.getElementsByTagName('input')[0];
-var outputElement = document.getElementsByTagName('output')[0];
-
-function stem(value) {
-    outputElement.textContent = stemmer(inputElement.value);
-}
-
-inputElement.addEventListener('input', function (event) {
-    stem();
-});
-
-stem();
-
-});
-
-require("stemmer-gh-pages");
+}, {}]}, {}, {"1":""})

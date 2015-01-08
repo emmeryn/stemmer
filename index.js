@@ -1,13 +1,34 @@
-var stemmer = require('stemmer');
-var inputElement = document.getElementsByTagName('input')[0];
-var outputElement = document.getElementsByTagName('output')[0];
+'use strict';
 
-function stem(value) {
-    outputElement.textContent = stemmer(inputElement.value);
+/*
+ * Dependencies.
+ */
+
+var stemmer = require('wooorm/stemmer@0.1.4');
+
+/*
+ * DOM nodes.
+ */
+
+var $input = document.getElementsByTagName('input')[0];
+var $output = document.getElementsByTagName('output')[0];
+
+/*
+ * Handlers.
+ */
+
+function oninputchange() {
+    $output.textContent = stemmer($input.value);
 }
 
-inputElement.addEventListener('input', function (event) {
-    stem();
-});
+/*
+ * Listen.
+ */
 
-stem();
+$input.addEventListener('input', oninputchange);
+
+/*
+ * Initial answer.
+ */
+
+oninputchange();
