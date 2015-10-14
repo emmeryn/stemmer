@@ -5,3 +5,7 @@ build/
 components/
 node_modules/
 coverage/
+
+# JetBrains IDEs configuration
+*.iml
+.idea/
